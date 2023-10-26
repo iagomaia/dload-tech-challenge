@@ -3,7 +3,6 @@ package middlewares
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -19,11 +18,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 		authHeader := r.Header.Get("Authorization")
 		token := strings.TrimPrefix(authHeader, "Bearer ")
-		fmt.Println("token")
-		fmt.Println("token")
-		fmt.Println(token)
-		fmt.Println("token")
-		fmt.Println("token")
 		jwtAdapter := adaptersfactories.GetJwtAdapter()
 		claims, err := jwtAdapter.Verify(token)
 		if err != nil {

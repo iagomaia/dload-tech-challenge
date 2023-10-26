@@ -48,7 +48,8 @@ func (r *GetUserByEmailRepository) Get(email string) (*usermodels.User, error) {
 	}
 	defer r.session.EndSession(r.ctx)
 	query := bson.M{
-		"email": email,
+		"email":     email,
+		"deletedAt": nil,
 	}
 	result := r.collection.FindOne(r.ctx, query)
 	if result.Err() != nil {

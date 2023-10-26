@@ -55,7 +55,8 @@ func (r *GetUserByIDRepository) Get(id string) (*usermodels.User, error) {
 	}
 
 	query := bson.M{
-		"_id": oid,
+		"_id":       oid,
+		"deletedAt": nil,
 	}
 	result := r.collection.FindOne(r.ctx, query)
 	if result.Err() != nil {

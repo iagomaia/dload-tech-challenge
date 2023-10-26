@@ -62,7 +62,7 @@ func (r *SoftDeleteUserRepository) SoftDelete(id string) error {
 		return cErr
 	}
 
-	if result.MatchedCount == 1 {
+	if result.MatchedCount == 0 {
 		cErr = utils.CustomError{
 			Status:  http.StatusNotFound,
 			Message: "User not found",

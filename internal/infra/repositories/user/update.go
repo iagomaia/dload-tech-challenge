@@ -58,7 +58,8 @@ func (r *UpdateUserRepository) Update(dto *userservicesprotocols.UpdateUserDto) 
 
 	payload := mapUpdateUserDtoToPayload(dto)
 	query := bson.M{
-		"_id": oid,
+		"_id":       oid,
+		"deletedAt": nil,
 	}
 
 	returnDoc := options.After

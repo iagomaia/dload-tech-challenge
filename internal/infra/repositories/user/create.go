@@ -9,12 +9,20 @@ import (
 	"github.com/iagomaia/dload-tech-challenge/internal/domain/models/utils"
 	factories "github.com/iagomaia/dload-tech-challenge/internal/factories/clients"
 	userservicesprotocols "github.com/iagomaia/dload-tech-challenge/internal/services/protocols/user"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	_ userservicesprotocols.ICreateUserRepository = (*CreateUserRepository)(nil)
+	_       userservicesprotocols.ICreateUserRepository = (*CreateUserRepository)(nil)
+	indexes                                             = []mongo.IndexModel{
+		{
+			Keys:    bson.M{"email": 1},
+			Options: options.Index().SetUnique(true),
+		},
+	}
 )
 
 type CreateUserRepository struct {
@@ -29,6 +37,10 @@ func (r *CreateUserRepository) Init() {
 		log.Fatalf("Error connection to DB: %v\n", err)
 	}
 	defer session.EndSession(context.Background())
+	_, err = collection.Indexes().CreateMany(context.Background(), indexes)
+	if err != nil {
+		log.Fatalf("Error creating indexes: %v\n", err)
+	}
 	r.session = session
 	r.collection = collection
 }
@@ -50,6 +62,13 @@ func (r *CreateUserRepository) Create(dto *userservicesprotocols.CreateUserDto) 
 			Status:        http.StatusInternalServerError,
 			Message:       "Error inserting user into DB",
 			OriginalError: err,
+		}
+		if mongo.IsDuplicateKeyError(err) {
+			cErr = utils.CustomError{
+				Status:        http.StatusConflict,
+				Message:       "Email already in use",
+				OriginalError: err,
+			}
 		}
 		return nil, cErr
 	}
