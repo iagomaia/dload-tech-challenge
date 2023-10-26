@@ -19,6 +19,7 @@ func GetUserRoutes() *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middlewares.AuthMiddleware)
 	r.Get("/me", adapters.AdaptRoute[any](usercontrollersfactories.GetMeController(), nil))
+	r.Delete("/me", adapters.AdaptRoute[any](usercontrollersfactories.GetDeleteMeController(), nil))
 	r.Patch("/{userId}", adapters.AdaptRoute[usercontracts.UpdateUserRequest](usercontrollersfactories.GetUpdateUserController(), &[]string{"userId"}))
 	return r
 }
